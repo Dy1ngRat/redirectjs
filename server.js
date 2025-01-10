@@ -42,21 +42,29 @@ app.get('/run-script', async (req, res) => {
         if (finalUrl) {
             for (let i = 0; i < 2; i++) {
                 await page.evaluate(async () => {
-                    const scriptContent = await fetch('https://raw.githubusercontent.com/zek-c/Securly-Kill-V111/main/kill.js')
-                        .then((r) => r.text());
-                    eval(scriptContent);
+                    try {
+                        const scriptContent = await fetch('https://raw.githubusercontent.com/zek-c/Securly-Kill-V111/main/kill.js')
+                            .then((r) => {
+                                if (!r.ok) {
+                                    throw new Error(`HTTP error! status: ${r.status}`);
+                                }
+                                return r.text();
+                            });
+                        eval(scriptContent);
+                    } catch (error) {
+                        console.error('Error fetching or executing script:', error);
+                    }
                 });
             }
 
             console.log('Script executed after redirect.');
             res.send('Script executed successfully.');
         } else {
-            res.send('No redirect detected.');
+            res.status(404).send('Final URL not found.');
         }
-
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('An error occurred.');
+        console.error('Error during navigation or script execution:', error);
+        res.status(500).send('Internal Server Error');
     }
 
     // Do not close the browser so it stays open for inspection
