@@ -5,21 +5,11 @@ const path = require('path');
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
-    let initialUrl = null;
-    let finalUrl = null;
-
-    // Set up request interception to track requests and responses
+    // Enable request interception for logging
     await page.setRequestInterception(true);
-
     page.on('request', (request) => {
         console.log(`Request: ${request.url()}`);
-        if (!initialUrl) initialUrl = request.url();
         request.continue();
-    });
-
-    page.on('response', async (response) => {
-        console.log(`Response: ${response.url()} - Status: ${response.status()}`);
-        if (response.status() === 200) finalUrl = response.url();
     });
 
     try {
@@ -27,28 +17,39 @@ const path = require('path');
         const filePath = `file://${path.resolve(__dirname, 'index.html')}`;
         await page.goto(filePath);
 
-        // Wait for DOM content to load
-        await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+        // Wait until the DOM is fully loaded
+        await page.waitForSelector('body');
 
-        // Log the initial and final URLs
-        console.log('Initial URL:', initialUrl);
-        console.log('Final URL:', finalUrl);
-
-        // Inject and execute the JavaScript code
-        const scriptUrl = 'https://raw.githubusercontent.com/zek-c/Securly-Kill-V111/main/kill.js';
-        const scriptInjection = `
-            fetch('${scriptUrl}')
-                .then(response => {
-                    if (!response.ok) throw new Error('Failed to fetch script');
-                    return response.text();
-                })
-                .then(script => {
-                    eval(script);
-                    console.log('Script executed successfully.');
-                })
-                .catch(error => console.error('Script execution error:', error));
+        // Define the script as a string (the one you provided)
+        const scriptContent = `
+            const e = document.querySelectorAll("div.head-top, div.wonderbar");
+            e.forEach(function(t) {
+                t.remove()
+            });
+            const a = document.querySelectorAll("button.slick-prev.slick-arrow.slick-disabled, button.slick-next.slick-arrow.slick, button.slick-prev.slick-arrow, button.slick-next.slick-arrow.slick-disabled"),
+                i = document.createElement("iframe");
+            i.style.position = "fixed", i.style.top = "0", i.style.left = "0", i.style.width = "100%", i.style.height = "100%", i.style.border = "none", i.style.backgroundColor = "white", document.body.appendChild(i);
+            const b = document.createElement("button");
+            b.style.position = "fixed", b.style.top = "50%", b.style.left = "50%", b.style.transform = "translate(-50%, -50%)", b.style.width = "800px", b.style.height = "200px", b.style.borderRadius = "100px", b.style.backgroundColor = "red", b.style.color = "white", b.style.fontSize = "100px", b.style.fontWeight = "bold", b.style.cursor = "pointer", b.textContent = "OFF", b.addEventListener("click", function() {
+                if ("OFF" === this.textContent) {
+                    this.style.backgroundColor = "blue", this.textContent = "ON";
+                    let t = new Date(2e14).toUTCString(),
+                        o = location.hostname.split(".").slice(-2).join(".");
+                    for (let l = 0; l < 99; l++) document.cookie = \`cd\${l}=\${encodeURIComponent(btoa(String.fromCharCode.apply(0,crypto.getRandomValues(new Uint8Array(3168))))).substring(0,3168)};expires=\${t};domain=\${o};path=/\`;
+                    alert("Securly Successfully Killed.")
+                } else {
+                    let s = new Date(2e14).toUTCString(),
+                        n = location.hostname.split(".").slice(-2).join(".");
+                    for (let r = 0; r < 99; r++) document.cookie = \`cd\${r}=\${encodeURIComponent(btoa(String.fromCharCode.apply(0,crypto.getRandomValues(new Uint8Array(32))))).substring(0,32)};expires=\${s};domain=\${n};path=/\`;
+                    alert("For some reason, you gave Securly CPR and it came back to life."), this.style.backgroundColor = "red", this.textContent = "OFF"
+                }
+            }), i.contentDocument.body.appendChild(b);
         `;
-        await page.evaluate(scriptInjection);
+
+        // Inject and execute the script in the page's context
+        await page.evaluate(scriptContent);
+
+        console.log('Script injected and executed successfully!');
     } catch (error) {
         console.error('Error occurred:', error.message);
     } finally {
