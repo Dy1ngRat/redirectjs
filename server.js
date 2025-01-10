@@ -5,7 +5,7 @@ const app = express();
 const port = 3000;
 
 // Define the route to trigger the Puppeteer script
-app.get('/run-script', async (req, res) => {
+app.get('/', async (req, res) => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
