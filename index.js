@@ -72,6 +72,6 @@ const path = require('path');
         console.error('An error occurred:', error.message);
     } finally {
         // Gracefully close the browser (toggle this if you want to keep it open)
-        await browser.close();
+        //await browser.close();
     }
 })();
