@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const path = require('path');
 
 (async () => {
     const browser = await puppeteer.launch({ headless: false }); // Launch browser
@@ -25,11 +26,9 @@ const puppeteer = require('puppeteer');
     });
 
     try {
-        // Navigate to the initial page and track the initial URL
-        initialUrl = page.url();
-        console.log('Initial URL:', initialUrl);
-
-        await page.goto('https://dy1ngrat.github.io/pupet/'); // Replace with your initial URL
+        // Navigate to the local index.html file
+        const filePath = `file://${path.resolve(__dirname, 'index.html')}`;
+        await page.goto(filePath);
 
         // Wait for navigation/redirection to complete
         await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
