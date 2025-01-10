@@ -1,0 +1,27 @@
+name: Run Puppeteer Script and Check for Redirect
+
+on:
+  push:
+    branches:
+      - main  # Replace with your target branch
+
+jobs:
+  run-puppeteer:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # Adjust Node version as needed
+
+    - name: Install Puppeteer
+      run: |
+        npm install puppeteer
+
+    - name: Run Puppeteer script
+      run: |
+        node index.js  # Adjust script file name if necessary
